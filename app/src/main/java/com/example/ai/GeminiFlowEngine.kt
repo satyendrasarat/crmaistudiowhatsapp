@@ -1,5 +1,6 @@
 package com.example.ai
 
+import android.content.Context
 import android.util.Log
 import com.example.data.AssistantTone
 import com.example.data.ChatMessageEntity
@@ -56,7 +57,18 @@ data class FlowDecisionResult(
  * sentiment guardrails and RAG replies, and `gemini-3.8-flash` for multimodal PDF indexing,
  * with automatic cross-model timeout resilience.
  */
-class GeminiFlowEngine {
+class GeminiFlowEngine(context: Context) {
+
+    private val appContext = context.applicationContext ?: context
+
+    private fun requireFirebaseReady() {
+        val app = ensureFirebaseInitialized(appContext)
+            ?: throw IllegalStateException(
+                "Firebase is not configured for this build. Ensure google-services.json is included and rebuild."
+            )
+        configureAppCheck(appContext, null)
+        Log.v(TAG, "Using FirebaseApp ${app.name}")
+    }
 
     private val pdfExtractionSchema = Schema.obj(
         properties = mapOf(
@@ -131,6 +143,7 @@ class GeminiFlowEngine {
     }
 
     private val pdfExtractorPrimary by lazy {
+        requireFirebaseReady()
         Firebase.ai.generativeModel(
             modelName = PDF_EXTRACTOR_MODEL,
             generationConfig = pdfExtractorConfig
@@ -138,6 +151,7 @@ class GeminiFlowEngine {
     }
 
     private val pdfExtractorFallback by lazy {
+        requireFirebaseReady()
         Firebase.ai.generativeModel(
             modelName = FAST_FLOW_MODEL,
             generationConfig = pdfExtractorConfig
@@ -145,6 +159,7 @@ class GeminiFlowEngine {
     }
 
     private val flowAssistantPrimary by lazy {
+        requireFirebaseReady()
         Firebase.ai.generativeModel(
             modelName = FAST_FLOW_MODEL,
             generationConfig = flowAssistantConfig
@@ -152,6 +167,7 @@ class GeminiFlowEngine {
     }
 
     private val flowAssistantFallback by lazy {
+        requireFirebaseReady()
         Firebase.ai.generativeModel(
             modelName = PDF_EXTRACTOR_MODEL,
             generationConfig = flowAssistantConfig

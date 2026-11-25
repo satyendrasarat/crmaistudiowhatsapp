@@ -30,7 +30,7 @@ data class PipelineExecutionOutcome(
 class ReplyFlowRepository(
     private val context: Context,
     private val database: AppDatabase = AppDatabase.getInstance(context),
-    private val geminiEngine: GeminiFlowEngine = GeminiFlowEngine()
+    private val geminiEngine: GeminiFlowEngine = GeminiFlowEngine(context.applicationContext)
 ) {
     private val knowledgeDao = database.knowledgeDao()
     private val flowConfigDao = database.flowConfigDao()

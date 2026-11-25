@@ -4,6 +4,7 @@ import android.app.Notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import com.example.ai.configureAppCheck
 import com.example.data.ReplyFlowRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,7 @@ class WhatsAppNotificationListenerService : NotificationListenerService() {
 
     override fun onCreate() {
         super.onCreate()
+        configureAppCheck(applicationContext, null)
         repository = ReplyFlowRepository(applicationContext)
         HandoffNotifier.ensureChannel(applicationContext)
     }
